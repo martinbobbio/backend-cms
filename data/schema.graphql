@@ -1,0 +1,108 @@
+type Query {
+    getClients(limit: Int, offset: Int): [Client]
+    getClient(id: ID): Client
+    getTotalClients: String
+    getTopClients: [ClientTotal]
+    getProducts(limit: Int, offset: Int, stock: Boolean): [Product]
+    getProduct(id: ID): Product
+    getTotalProducts: String
+    getOrders(client: ID): [Order]
+    getUser: User
+}
+
+type Mutation {
+    createClient(input: ClientInput): Client
+    updateClient(input: ClientInput): Client
+    deleteClient(id: ID!): String
+    createProduct(input: ProductInput): Product
+    updateProduct(input: ProductInput): Product
+    deleteProduct(id: ID!): String
+    createOrder(input: OrderInput): Order
+    updateOrder(input: OrderInput): Order
+    createUser(user: String!, password: String!): String
+    authUser(user: String!, password: String!): Token
+}
+
+type Client {
+    id: ID
+    name: String
+    surname: String
+    company: String
+    emails: [Email]
+    age: Int
+    type: TypeClient
+}
+type Email{
+    email: String
+}
+type Product {
+    id: ID
+    name: String!
+    price: Int!
+    stock: Int!
+}
+type Order {
+    id: ID
+    order: [OrderProduct]
+    total: Int
+    date: String
+    client: ID
+    status: StatusOrder
+}
+type OrderProduct {
+    id: ID
+    count: Int
+} 
+type ClientTotal{
+    total: Float
+    client: [Client]
+}
+type Token{
+    token: String!
+}
+type User{
+    user: String
+}
+
+
+enum TypeClient {
+    BASIC
+    PREMIUM
+}
+enum StatusOrder {
+    PENDING
+    COMPLETED
+    CANCELED
+}
+
+input EmailInput {
+    email: String
+}
+input ClientInput {
+    id: ID
+    name: String!
+    surname: String!
+    company: String!
+    emails: [EmailInput]
+    age: Int!
+    type: TypeClient!
+    orders: [OrderInput]
+}
+input ProductInput {
+    id: ID
+    name: String!
+    price: Int!
+    stock: Int!
+}
+input OrderInput {
+    id: ID
+    order: [OrderProductInput]
+    total: Int
+    date: String
+    client: ID
+    status: StatusOrder
+}
+input OrderProductInput {
+    id: ID
+    count: Int
+} 
