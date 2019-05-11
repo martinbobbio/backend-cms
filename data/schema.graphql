@@ -1,8 +1,9 @@
 type Query {
-    getClients(limit: Int, offset: Int): [Client]
+    getClients(limit: Int, offset: Int, seller: String): [Client]
     getClient(id: ID): Client
-    getTotalClients: String
+    getTotalClients(seller:String): String
     getTopClients: [ClientTotal]
+    getTopSellers: [SellerTotal]
     getProducts(limit: Int, offset: Int, stock: Boolean): [Product]
     getProduct(id: ID): Product
     getTotalProducts: String
@@ -19,7 +20,7 @@ type Mutation {
     deleteProduct(id: ID!): String
     createOrder(input: OrderInput): Order
     updateOrder(input: OrderInput): Order
-    createUser(user: String!, password: String!): String
+    createUser(user: String!, password: String!, role: String!, name:String!): String
     authUser(user: String!, password: String!): Token
 }
 
@@ -57,11 +58,18 @@ type ClientTotal{
     total: Float
     client: [Client]
 }
+type SellerTotal{
+    total: Float
+    seller: [User]
+}
 type Token{
     token: String!
 }
 type User{
     user: String
+    id: ID
+    name: String
+    role: String
 }
 
 
@@ -87,6 +95,7 @@ input ClientInput {
     age: Int!
     type: TypeClient!
     orders: [OrderInput]
+    seller: ID
 }
 input ProductInput {
     id: ID
@@ -101,6 +110,7 @@ input OrderInput {
     date: String
     client: ID
     status: StatusOrder
+    seller: ID
 }
 input OrderProductInput {
     id: ID

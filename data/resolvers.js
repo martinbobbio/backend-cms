@@ -2,6 +2,7 @@ import { Clients, Products, Orders, Users } from './db'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
 
 const createToken = (authUser, secret, expiresIn) => {
     const { user } = authUser
@@ -10,10 +11,14 @@ const createToken = (authUser, secret, expiresIn) => {
 
 dotenv.config({path: 'variables.env'})
 
+const ObjectId = mongoose.Types.ObjectId 
+
 export const resolvers = {
     Query:{
-        getClients: (root, {limit, offset}) =>{
-            return Clients.find({}).limit(limit).skip(offset)
+        getClients: (root, {limit, offset, seller}) =>{
+            let filter
+            if(seller) filter = { seller: new ObjectId(seller) }
+            return Clients.find(filter).limit(limit).skip(offset)
         },
         getClient: (root, {id}) => {
             return new Promise((resolve, reject) => {
@@ -23,9 +28,11 @@ export const resolvers = {
                 })
             })
         },
-        getTotalClients: (root) => {
+        getTotalClients: (root, {seller}) => {
             return new Promise((resolve, reject) => {
-                Clients.countDocuments({}, (error, count) => {
+                let filter
+                if(seller) filter = { seller: new ObjectId(seller) }
+                Clients.countDocuments(filter, (error, count) => {
                     if(error) reject(error)
                     else resolve(count)
                 })
@@ -37,6 +44,20 @@ export const resolvers = {
                      { $match:{status:"COMPLETED"} },
                      { $group:{_id:"$client", total: {$sum:"$total"}} },
                      { $lookup:{from:"clients", localField: "_id", foreignField:"_id", as: "client"} },
+                     { $sort:{total:-1} },
+                     { $limit:10 },
+                 ], (error, result) => {
+                    if(error) reject(error)
+                    else resolve(result)
+                 })
+            })
+        },
+        getTopSellers: (root) => {
+            return new Promise((resolve, reject) => {
+                 Orders.aggregate([
+                     { $match:{status:"COMPLETED"} },
+                     { $group:{_id:"$seller", total: {$sum:"$total"}} },
+                     { $lookup:{from:"users", localField: "_id", foreignField:"_id", as: "seller"} },
                      { $sort:{total:-1} },
                      { $limit:10 },
                  ], (error, result) => {
@@ -90,6 +111,7 @@ export const resolvers = {
                 age : input.age,
                 type : input.type,
                 orders : input.orders,
+                seller: input.seller
             })
             newClient.id = newClient._id
             return new Promise((resolve, reject) => {
@@ -152,6 +174,7 @@ export const resolvers = {
                 date : new Date(),
                 client : input.client,
                 status : "PENDING",
+                seller: input.seller
             })
             newOrder.id = newOrder._id
             return new Promise((resolve, reject) => {
@@ -184,11 +207,11 @@ export const resolvers = {
                 })
             })
         },
-        createUser:  async (root, {user, password}) => {
+        createUser:  async (root, {user, password, role, name}) => {
             const existsUser = await Users.findOne({user})
             if(existsUser) throw new Error('The user exists')
-
-            await new Users({ user, password }).save()
+            
+            await new Users({ user, password, role, name }).save()
 
             return true
         },
