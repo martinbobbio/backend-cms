@@ -4,7 +4,8 @@
   "description": "Graphql Server",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./index --exec babel-node -e js"
+    "start": "babel-node ./index",
+    "nodemon": "nodemon ./index --exec babel-node -e js"
   },
   "author": "Martin Bobbio",
   "license": "ISC",

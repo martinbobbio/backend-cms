@@ -8,6 +8,7 @@ import { resolvers } from './data/resolvers'
 
 dotenv.config({path: 'variables.env'})
 
+const port = process.env.PORT || 3000
 const app = express()
 const server = new ApolloServer({typeDefs, resolvers, context: async({req}) => {
     const token = req.headers['authorization']
@@ -26,4 +27,4 @@ const server = new ApolloServer({typeDefs, resolvers, context: async({req}) => {
 
 server.applyMiddleware({app})
 
-app.listen({port: 5000}, () => console.log(`Server run in: http://localhost:5000${server.graphqlPath} \x1b[32m%s\x1b[0m`, "online"))
+app.listen({port}, () => console.log(`Server run in: http://localhost:${port}${server.graphqlPath} \x1b[32m%s\x1b[0m`, "online"))

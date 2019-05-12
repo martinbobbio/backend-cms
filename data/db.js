@@ -3,7 +3,12 @@ import bcrypt from 'bcrypt'
 
 mongoose.Promise = global.Promise
 mongoose.set('useFindAndModify', false);
-mongoose.connect('mongodb://localhost/clients', { useNewUrlParser: true })
+
+const env = process.argv[2] || 'dev'
+if(env === 'dev')
+    mongoose.connect('mongodb://localhost/clients', { useNewUrlParser: true })
+else if(env === 'prod')
+    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155516.mlab.com:55516/cms', { useNewUrlParser: true })
 
 const ClientsSchema = new mongoose.Schema({
     name: String,
