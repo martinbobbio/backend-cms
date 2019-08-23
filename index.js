@@ -27,11 +27,13 @@ const server = new ApolloServer({typeDefs, resolvers, context: async({req}) => {
 
 server.applyMiddleware({app})
 
-let allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header('Access-Control-Allow-Headers', "*");
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
     next();
-}
-app.use(allowCrossDomain);
+});
+
 
 app.listen({port}, () => console.log(`Server run in:${port}${server.graphqlPath} \x1b[32m%s\x1b[0m`, "online"))
