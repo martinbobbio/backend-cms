@@ -4,11 +4,8 @@ import bcrypt from 'bcrypt'
 mongoose.Promise = global.Promise
 mongoose.set('useFindAndModify', false);
 
-const env = process.argv[2] || 'dev'
-if(env === 'dev')
-    mongoose.connect('mongodb://localhost:27017/clients', { useNewUrlParser: true }, console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
-else if(env === 'prod')
-    mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155516.mlab.com:55516/cms', { useNewUrlParser: true }, () => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
+//mongoose.connect('mongodb://localhost:27017/clients', { useNewUrlParser: true }, console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
+mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155516.mlab.com:55516/cms', { useNewUrlParser: true }, () => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
 
 const ClientsSchema = new mongoose.Schema({
     name: String,
