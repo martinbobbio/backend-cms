@@ -4,8 +4,17 @@ import bcrypt from 'bcrypt'
 mongoose.Promise = global.Promise
 mongoose.set('useFindAndModify', false);
 
-//mongoose.connect('mongodb://localhost:27017/clients', { useNewUrlParser: true }, console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
-mongoose.connect('mongodb://mbobbio:mbobbio1010@ds155516.mlab.com:55516/cms', { useNewUrlParser: true }, () => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
+const env = process.env.ENV || 'dev'
+let adressDB;
+
+if(env === 'dev') adressDB = 'mongodb://localhost/cms'
+else if(env === 'prod') adressDB = 'mongodb://mbobbio:mbobbio1010@ds155516.mlab.com:55516/cms'
+else if(env === 'docker') adressDB = 'mongodb://mongo:27017/cms'
+  
+mongoose.connect(adressDB, { useNewUrlParser: true })
+.then(() => console.log("Base de datos: \x1b[32m%s\x1b[0m", "online"))
+.catch(error => console.log(`Error al conectar la DB en ${env}`, error))
+
 
 const ClientsSchema = new mongoose.Schema({
     name: String,
